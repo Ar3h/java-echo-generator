@@ -6,7 +6,7 @@
     <groupId>jeg</groupId>
     <artifactId>java-echo-generator</artifactId>
     <packaging>pom</packaging>
-    <version>${reversion}</version>
+    <version>1.0.0</version>
     <modules>
         <module>jeg-core</module>
         <module>jeg-common</module>

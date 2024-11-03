@@ -4,7 +4,7 @@
     <parent>
         <groupId>jeg</groupId>
         <artifactId>java-echo-generator</artifactId>
-        <version>${reversion}</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>jEG-gui</artifactId>
     <dependencies>
@@ -21,11 +21,11 @@
         <dependency>
             <groupId>jeg</groupId>
             <artifactId>jEG-core</artifactId>
-            <version>${reversion}</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
     <build>
-        <finalName>${artifactId}-${reversion}</finalName>
+        <finalName>${artifactId}-1.0.0</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
